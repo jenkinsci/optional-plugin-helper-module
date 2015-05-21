@@ -192,6 +192,7 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
             }
         }
 
+        LOGGER.log(Level.FINE, "List of plugins: " + result);
         return result;
     }
 
@@ -475,6 +476,8 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
             LOGGER.log(Level.WARNING, "Cyclic reference detected amongst bundled plugins: " + plugins, e);
             cannotDynamicLoad = true;
         }
+        LOGGER.log(Level.FINE, "Sorted plugin load order: {0}", cgd.getSorted());
+        LOGGER.log(Level.INFO, "Starting dynamic loading of optional bundled plugins");
         for (PluginWrapper plugin : cgd.getSorted()) {
             File archive = newPlugins.get(plugin.getShortName());
             if (archive == null) {
@@ -503,6 +506,7 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
                 break;
             }
         }
+        LOGGER.log(Level.INFO, "Finished dynamic loading of optional bundled plugins, restart required {0}", cannotDynamicLoad);
         return cannotDynamicLoad;
     }
 
