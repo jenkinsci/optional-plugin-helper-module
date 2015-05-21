@@ -93,6 +93,9 @@ public abstract class PluginWrapperFilter implements ExtensionPoint {
     public static Decision decide(PluginWrapper plugin, File archive) {
         final Jenkins jenkins = Jenkins.getInstance();
         Decision result = Decision.NO_OPINION;
+        if (jenkins == null) {
+            return result;
+        }
         // TODO replace with ExtensionList.lookup() once past 1.572
         for (PluginWrapperFilter filter : jenkins.getExtensionList(PluginWrapperFilter.class)) {
             try {

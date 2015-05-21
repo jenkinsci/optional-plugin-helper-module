@@ -79,8 +79,8 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
     /**
      * Save having to re-extract when the sources do not add new URLs that have been extracted already
      */
-    private final Map<URL, ExtractedPluginMetadata> extractedPluginMetadataMap =
-            Collections.synchronizedMap(new HashMap<URL, ExtractedPluginMetadata>());
+    private final Map<String, ExtractedPluginMetadata> extractedPluginMetadataMap =
+            Collections.synchronizedMap(new HashMap<String, ExtractedPluginMetadata>());
 
     /**
      * Default constructor.
@@ -132,7 +132,8 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
         }
         for (URL resource : PluginSource.allPlugins()) {
             try {
-                ExtractedPluginMetadata metadata = extractedPluginMetadataMap.get(resource);
+                final String externalForm = resource.toExternalForm();
+                ExtractedPluginMetadata metadata = extractedPluginMetadataMap.get(externalForm);
                 if (metadata != null) {
                     File archive = new File(baseDir, metadata.shortName + ".jpi");
                     if (archive.isFile() && archive.length() == metadata.length && Util.getDigestOf(archive)
@@ -155,12 +156,8 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
                 if (file.isFile() && (file.lastModified() == lastModified || lastModified == 0)
                         && file.length() == size) {
                     final String fileDigest = Util.getDigestOf(file);
-                    final InputStream stream = connection.getInputStream();
-                    if (stream == null) {
-                        LOGGER.log(Level.WARNING, "{0} returned a null input stream, ignoring", resource);
-                        continue;
-                    }
                     final String resourceDigest;
+                    final InputStream stream = connection.getInputStream();
                     try {
                         resourceDigest = Util.getDigestOf(stream);
                     } finally {
@@ -168,7 +165,7 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
                     }
                     if (fileDigest.equals(resourceDigest)) {
                         result.add(file);
-                        extractedPluginMetadataMap.put(resource, new ExtractedPluginMetadata(file));
+                        extractedPluginMetadataMap.put(externalForm, new ExtractedPluginMetadata(file));
                         continue;
                     }
                 }
@@ -189,7 +186,7 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
                     }
                 }
                 result.add(file);
-                extractedPluginMetadataMap.put(resource, new ExtractedPluginMetadata(file));
+                extractedPluginMetadataMap.put(externalForm, new ExtractedPluginMetadata(file));
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, String.format("Could not process optional plugin from %s", resource), e);
             }
