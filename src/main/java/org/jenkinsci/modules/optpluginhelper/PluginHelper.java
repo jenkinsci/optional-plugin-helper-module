@@ -296,7 +296,7 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
         boolean cannotDynamicLoad = false;
         for (PluginWrapper wrapper : wrapperToFile.keySet()) {
             final PluginWrapper existing = pm.getPlugin(wrapper.getShortName());
-            if (existing != null && (existing.isActive() || existing.isEnabled())) {
+            if (existing != null && (existing.isActive() || existing.isEnabled()) && !existing.isPinned()) {
                 LOGGER.log(Level.INFO, "Cannot dynamically load optional plugins because {0} is already installed",
                         existing.getShortName());
                 cannotDynamicLoad = true;
@@ -373,6 +373,13 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
                             new Object[]{shortName, existing.getVersion(), proposed.getVersion()});
                     continue;
                 }
+                if (existing.isPinned()) {
+                    LOGGER.log(Level.INFO,
+                            "Ignoring installing plugin {0} as it is pinned. You might want to unpin this plugin.",
+                            new Object[]{shortName});
+                    continue;
+                }
+
                 LOGGER.log(Level.INFO, "Restart required as plugin {0} is already installed", shortName);
                 cannotDynamicLoad = true;
             }
