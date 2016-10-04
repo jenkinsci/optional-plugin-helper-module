@@ -335,7 +335,7 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
                 if (v == null || v.isOlderThan(new VersionNumber(d.version))) {
                     missingDependency = true;
                     LOGGER.log(Level.FINER, "{0} is missing a dependency on {1} version {2}",
-                            new Object[]{w.getShortName(), d.shortName, d.shortName});
+                            new Object[]{w.getShortName(), d.shortName, d.version});
                 }
             }
             for (PluginWrapper.Dependency d : w.getOptionalDependencies()) {
@@ -343,7 +343,7 @@ public class PluginHelper extends Descriptor<PluginHelper> implements Describabl
                 if (v != null && v.isOlderThan(new VersionNumber(d.version))) {
                     missingDependency = true;
                     LOGGER.log(Level.FINER, "{0} is missing a dependency on {1} version {2}",
-                            new Object[]{w.getShortName(), d.shortName, d.shortName});
+                            new Object[]{w.getShortName(), d.shortName, d.version});
                 }
             }
             if (missingDependency) {
